@@ -17,6 +17,7 @@ module Cardano.Tracing.Metrics
   , MaxKESEvolutions (..)
   , OperationalCertStartKESPeriod (..)
   , HasKESMetricsData (..)
+  , HasKESInfo (..)
   , ForgingStats (..)
   , ForgeThreadStats (..)
   , mapForgingCurrentThreadStats
@@ -33,7 +34,7 @@ import           Control.Concurrent.STM
 import           Data.IORef (IORef, atomicModifyIORef', newIORef)
 import qualified Data.Map.Strict as Map
 import           Data.SOP.Strict (All, hcmap, K (..), hcollapse)
-import           Ouroboros.Consensus.Block (ForgeStateInfo)
+import           Ouroboros.Consensus.Block (ForgeStateInfo, ForgeStateUpdateError)
 import           Ouroboros.Consensus.Byron.Ledger.Block (ByronBlock)
 import           Ouroboros.Consensus.HardFork.Combinator
 import           Ouroboros.Consensus.TypeFamilyWrappers (WrapForgeStateInfo (..))
@@ -103,6 +104,18 @@ instance All HasKESMetricsData xs => HasKESMetricsData (HardForkBlock xs) where
              => WrapForgeStateInfo blk
              -> K KESMetricsData blk
       getOne = K . getKESMetricsData (Proxy @blk) . unwrapForgeStateInfo
+
+class HasKESInfo blk where
+  getKESInfo :: Proxy blk -> ForgeStateUpdateError blk -> Maybe HotKey.KESInfo
+  getKESInfo _ _ = Nothing
+
+instance HasKESInfo (ShelleyBlock c) where
+  getKESInfo _ (HotKey.KESCouldNotEvolve ki _) = Just ki
+  getKESInfo _ (HotKey.KESKeyAlreadyPoisoned ki _) = Just ki
+
+instance HasKESInfo ByronBlock
+
+instance All HasKESInfo xs => HasKESInfo (HardForkBlock xs)
 
 -- | This structure stores counters of blockchain-related events,
 --   per individual forge thread.
