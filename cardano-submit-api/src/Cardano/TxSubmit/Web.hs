@@ -34,6 +34,8 @@ import Cardano.Binary
     ( DecoderError )
 import Cardano.BM.Trace
     ( Trace, logInfo )
+import Cardano.TxSubmit.Rest.Types
+    ( WebserverConfig (..), toWarpSettings )
 import Control.Monad.IO.Class
     ( liftIO )
 import Data.Aeson
@@ -52,8 +54,6 @@ import Servant.Server.Generic
     ( AsServerT )
 
 import qualified Cardano.Crypto.Hash.Class as Crypto
-import Cardano.TxSubmit.Rest.Types
-    ( WebserverConfig (..), toWarpSettings )
 import qualified Data.Aeson as Aeson
 import qualified Data.ByteString.Char8 as B8
 import qualified Data.Char as Char

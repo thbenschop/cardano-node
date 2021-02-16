@@ -9,16 +9,15 @@ module Cardano.TxSubmit.Config
   , readTxSubmitNodeConfig
   ) where
 
+
+import           Cardano.Prelude
+import           Cardano.TxSubmit.Util
+import           Data.Aeson (FromJSON (..), Object, Value (..), (.:))
+import           Data.Aeson.Types (Parser)
+
 import qualified Cardano.BM.Configuration as Logging
 import qualified Cardano.BM.Configuration.Model as Logging
 import qualified Cardano.BM.Data.Configuration as Logging
-
-import           Cardano.Prelude
-
-import           Cardano.TxSubmit.Util
-
-import           Data.Aeson (FromJSON (..), Object, Value (..), (.:))
-import           Data.Aeson.Types (Parser)
 import qualified Data.Aeson as Aeson
 import qualified Data.ByteString.Char8 as B8
 import qualified Data.Text as T

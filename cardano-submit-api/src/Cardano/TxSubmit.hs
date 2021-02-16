@@ -7,12 +7,8 @@ module Cardano.TxSubmit
   , runTxSubmitWebapi
   ) where
 
-import qualified Cardano.BM.Setup as Logging
-import qualified Cardano.BM.Trace as Logging
 import           Cardano.BM.Trace (Trace, logInfo)
-
 import           Cardano.Prelude
-
 import           Cardano.TxSubmit.CLI.Parsers as X
 import           Cardano.TxSubmit.CLI.Types as X
 import           Cardano.TxSubmit.Config as X
@@ -22,6 +18,8 @@ import           Cardano.TxSubmit.Types as X
 import           Cardano.TxSubmit.Util as X
 import           Cardano.TxSubmit.Web as X
 
+import qualified Cardano.BM.Setup as Logging
+import qualified Cardano.BM.Trace as Logging
 import qualified Control.Concurrent.Async as Async
 
 runTxSubmitWebapi :: TxSubmitNodeParams -> IO ()

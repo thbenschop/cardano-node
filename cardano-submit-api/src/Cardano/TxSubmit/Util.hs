@@ -6,7 +6,6 @@ module Cardano.TxSubmit.Util
   ) where
 
 import           Cardano.BM.Trace (Trace, logError)
-
 import           Cardano.Prelude
 
 import qualified Data.Text as T
