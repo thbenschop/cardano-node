@@ -458,13 +458,17 @@ in {
         RestartSec = 1;
         KillSignal = "SIGINT";
       };
-    } // optionalAttrs (!cfg.instanced) {
+    } // optionalAttrs (!cfg.instanced && cfg.instances == 1) {
       wantedBy = [ "multi-user.target" ];
+    } // optionalAttrs (cfg.instances > 1) {
+      partOf = ["cardano-node.service"];
+      requires = ["cardano-node.service"];
     }) (cfg.extraServiceConfig n i));
 
     systemd.sockets = genInstanceConf (n: i: lib.mkIf cfg.systemdSocketActivation (recursiveUpdate {
       description = "Socket of the ${n} service.";
       wantedBy = [ "sockets.target" ];
+      partOf = [ "${n}.service" ];
       socketConfig = {
         ListenStream = [ "${cfg.hostAddr}:${toString cfg.port}" ]
           ++ [(if (i == 0) then cfg.socketPath else "${runtimeDir}/node-${toString i}.socket")];
@@ -485,5 +489,19 @@ in {
         message = "Shelley Era: all of three [operationalCertificate kesKey vrfKey] options must be defined (or none of them).";
       }
     ];
-  });
+  } // optionalAttrs (cfg.instances > 1) ( let instances = genList (i: "cardano-node-${toString i}.service") cfg.instances; in  {
+    # oneshot service start allows to easily control all instances at once.
+    systemd.services.cardano-node = {
+      wantedBy = [ "multi-user.target" ];
+      serviceConfig = {
+        Type = "oneshot";
+        User = "cardano-node";
+        Group = "cardano-node";
+        ExecStart = "${pkgs.coreutils}/bin/echo Starting ${toString cfg.instances} cardano-node instances";
+        RuntimeDirectory = cfg.runtimeDir;
+        WorkingDirectory = cfg.stateDir;
+        StateDirectory =  lib.removePrefix stateDirBase cfg.stateDir;;
+      };
+    };
+  }));
 }
